@@ -384,15 +384,4 @@ struct TabContentView: View {
     }
 }
 
-extension MMEXPreview {
-    @ViewBuilder
-    static func tab<Content: View>(
-        _ title: String,
-        @ViewBuilder content: @escaping (_ pref: Preference, _ vm: ViewModel) -> Content
-    ) -> some View {
-        MMEXPreview.appWithSampleData { pref, vm in NavigationView {
-            content(pref, vm)
-                .navigationBarTitle(title, displayMode: .inline)
-        } }
-    }
-}
+

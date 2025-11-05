@@ -1,13 +1,6 @@
-//
-//  MMEXApp.swift
-//  MMEX
-//
-//  Created by Lisheng Guan on 2024/9/5.
-//
-
 import OSLog
 import SwiftUI
-import Amplitude
+import AmplitudeSwift
 
 let log = Logger(
     subsystem: Bundle.main.bundleIdentifier!,
@@ -19,6 +12,17 @@ struct MMEXApp: App {
     @StateObject private var pref = Preference()
     @StateObject private var vm = ViewModel(withStoredDatabase: ())
 
+    private let amplitude: Amplitude = {
+        let config = Configuration(
+            apiKey: "1e1fbc10354400d9c3392a89558d693d",
+            autocapture: [
+                .sessions,
+                .appLifecycles
+            ]
+        )
+        return Amplitude(configuration: config)
+    }()
+
     func track(pref: Preference) {
         log.debug("DEBUG: MMEXApp.track()")
         if pref.track.userId.isEmpty {
@@ -26,11 +30,7 @@ struct MMEXApp: App {
         }
 
         if pref.track.sendUsage == .boolTrue {
-            Amplitude.instance().setUserId(pref.track.userId) // copy from/to Infotable.UID
-            Amplitude.instance().defaultTracking = AMPDefaultTrackingOptions.initWithSessions(
-                true, appLifecycles: true, deepLinks: false, screenViews: false
-            )
-            Amplitude.instance().initializeApiKey("1e1fbc10354400d9c3392a89558d693d")
+            amplitude.setUserId(userId: pref.track.userId)
         }
     }
 
@@ -44,30 +44,5 @@ struct MMEXApp: App {
                 .environmentObject(pref)
                 .environmentObject(vm)
         }
-    }
-}
-
-@MainActor
-struct MMEXPreview {
-    static let pref = Preference()
-    static let vmWithoutData    = ViewModel.withoutData
-    static let vmWithSampleData = ViewModel.withSampleData
-
-    @ViewBuilder
-    static func appWithoutData<Content: View>(
-        @ViewBuilder content: @escaping (_ pref: Preference, _ vm: ViewModel) -> Content
-    ) -> some View {
-        content(Self.pref, Self.vmWithoutData)
-            .environmentObject(Self.pref)
-            .environmentObject(Self.vmWithoutData)
-    }
-
-    @ViewBuilder
-    static func appWithSampleData<Content: View>(
-        @ViewBuilder content: @escaping (_ pref: Preference, _ vm: ViewModel) -> Content
-    ) -> some View {
-        content(Self.pref, Self.vmWithSampleData)
-            .environmentObject(Self.pref)
-            .environmentObject(Self.vmWithSampleData)
     }
 }
