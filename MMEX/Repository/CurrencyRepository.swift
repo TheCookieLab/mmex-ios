@@ -42,7 +42,7 @@ struct CurrencyRepository: RepositoryProtocol {
     static let col_centName       = SQLite.Expression<String?>("CENT_NAME")
     static let col_scale          = SQLite.Expression<Int?>("SCALE")
     static let col_baseConvRate   = SQLite.Expression<Double?>("BASECONVRATE")
-    static let col_symbol         = SQLite.Expression<String>("CURRENCY_SYMBOL")
+    static let col_symbol         = SQLite.Expression<String?>("CURRENCY_SYMBOL")
     static let col_type           = SQLite.Expression<String>("CURRENCY_TYPE")
 
     // cast NUMERIC to REAL
@@ -77,7 +77,7 @@ struct CurrencyRepository: RepositoryProtocol {
             centName       : row[col_centName] ?? "",
             scale          : row[col_scale] ?? 0,
             baseConvRate   : row[cast_baseConvRate] ?? 0.0,
-            symbol         : row[col_symbol],
+            symbol         : row[col_symbol] ?? "",
             type           : CurrencyType(collateNoCase: row[col_type])
         )
     }
